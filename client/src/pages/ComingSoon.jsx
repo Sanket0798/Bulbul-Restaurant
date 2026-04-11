@@ -1,7 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
 
-const LAUNCH_DATE = new Date(Date.now() + 10 * 24 * 60 * 60 * 1000)
+const LAUNCH_DATE = (() => {
+  const key = 'bulbul_launch_date'
+  const stored = localStorage.getItem(key)
+  if (stored) return new Date(Number(stored))
+  const date = new Date(Date.now() + 25 * 24 * 60 * 60 * 1000)
+  localStorage.setItem(key, date.getTime())
+  return date
+})()
 
 function useCountdown(target) {
   const calc = () => {
@@ -232,8 +239,8 @@ export default function ComingSoon() {
         {/* Description */}
         <p
           ref={descRef}
-          className="text-white/70 max-w-sm sm:max-w-md px-2"
-          style={{ fontSize: '13px', lineHeight: '1.9' }}
+          className="text-white/70 max-w-sm sm:max-w-md px-2 text-sm md:text-base"
+          // style={{ fontSize: '13px', lineHeight: '1.9' }}  
         >
           We're crafting an extraordinary dining experience for you.
           Stay tuned — something delicious is on its way.
