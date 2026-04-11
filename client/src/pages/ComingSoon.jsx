@@ -93,9 +93,9 @@ export default function ComingSoon() {
         { y: 50, opacity: 0 },
         { y: 0, opacity: 1, duration: 0.9 }, '-=0.5'
       )
-      .fromTo(titleRef.current,
-        { y: 60, opacity: 0, scale: 0.9 },
-        { y: 0, opacity: 1, scale: 1, duration: 1.1 }, '-=0.5'
+      .fromTo(titleRef.current.querySelectorAll('.title-char'),
+        { opacity: 0, y: 15 },
+        { opacity: 1, y: 0, duration: 0.4, stagger: 0.06, ease: 'power2.out' }, '-=0.4'
       )
       .fromTo(dividerRef.current,
         { scaleX: 0, opacity: 0 },
@@ -122,10 +122,6 @@ export default function ComingSoon() {
         { y: 0, opacity: 1, scale: 1, duration: 0.5, stagger: 0.1, ease: 'back.out(1.7)' }, '-=0.3'
       )
 
-      // continuous float on script title
-      gsap.to(titleRef.current, {
-        y: -10, duration: 3, repeat: -1, yoyo: true, ease: 'sine.inOut', delay: 2,
-      })
     }, wrapperRef)
 
     return () => ctx.revert()
@@ -189,11 +185,15 @@ export default function ComingSoon() {
 
         {/* Script title */}
         <h1
-          // ref={titleRef}
+          ref={titleRef}
           className="text-white leading-none font-delafield"
           style={{ fontSize: 'clamp(52px, 14vw, 100px)' }}
         >
-          Coming Soon
+          {'Coming Soon'.split('').map((char, i) => (
+            <span key={i} className="title-char" style={{ display: 'inline-block', opacity: 0 }}>
+              {char === ' ' ? '\u00A0' : char}
+            </span>
+          ))}
         </h1>
 
         {/* Divider */}
