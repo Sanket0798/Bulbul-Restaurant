@@ -70,6 +70,32 @@ function Orbs() {
 
 export default function ComingSoon() {
   const { days, hours, minutes, seconds } = useCountdown(LAUNCH_DATE)
+  const [toast, setToast] = useState(false)
+  const [emailError, setEmailError] = useState('')
+  const toastRef = useRef(null)
+
+  const handleNotify = (e) => {
+    e.preventDefault()
+    const email = e.target.elements.email.value.trim()
+    const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    if (!valid) {
+      setEmailError('Please enter a valid email address.')
+      return
+    }
+    setEmailError('')
+    setToast(true)
+    gsap.fromTo(toastRef.current,
+      { y: -30, opacity: 0, scale: 0.95 },
+      { y: 0, opacity: 1, scale: 1, duration: 0.4, ease: 'back.out(1.5)' }
+    )
+    setTimeout(() => {
+      gsap.to(toastRef.current, {
+        y: -10, opacity: 0, duration: 0.35, ease: 'power2.in',
+        onComplete: () => setToast(false),
+      })
+    }, 3500)
+    e.target.reset()
+  }
 
   const wrapperRef  = useRef(null)
   const tagRef      = useRef(null)
@@ -265,15 +291,25 @@ export default function ComingSoon() {
         {/* Notify form */}
         <form
           ref={formRef}
-          onSubmit={(e) => e.preventDefault()}
+          onSubmit={handleNotify}
           className="flex flex-col sm:flex-row gap-3 w-full max-w-md mt-2"
         >
-          <input
-            type="email"
-            required
-            placeholder="Enter your email"
-            className="flex-1 px-4 py-3 bg-white/10 border border-white/20 text-white placeholder-white/40 outline-none focus:border-white/60 transition-colors text-sm w-full font-josefin"
-          />
+          <div className="flex flex-col flex-1 gap-1">
+            <input
+              type="email"
+              name="email"
+              placeholder="Enter your email"
+              onChange={() => emailError && setEmailError('')}
+              className={`px-4 py-3 bg-white/10 border text-white placeholder-white/40 outline-none transition-colors text-sm w-full font-josefin ${
+                emailError ? 'border-red-400 focus:border-red-400' : 'border-white/20 focus:border-white/60'
+              }`}
+            />
+            {emailError && (
+              <span className="text-red-400 font-josefin text-left" style={{ fontSize: '11px' }}>
+                {emailError}
+              </span>
+            )}
+          </div>
           <button
             type="submit"
             className="btn-outline-white whitespace-nowrap w-full sm:w-auto"
@@ -300,6 +336,26 @@ export default function ComingSoon() {
         </div>
 
       </div>
+
+      {/* Toast */}
+      {toast && (
+        <div
+          ref={toastRef}
+          className="fixed top-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-5 py-3 rounded"
+          style={{
+            background: 'rgba(20,20,20,0.92)',
+            border: '1px solid rgba(138,27,97,0.6)',
+            backdropFilter: 'blur(12px)',
+            boxShadow: '0 8px 32px rgba(138,27,97,0.25)',
+          }}
+        >
+          <span style={{ color: '#8A1B61', fontSize: '18px' }}>✓</span>
+          <p className="text-white font-josefin" style={{ fontSize: '13px', letterSpacing: '0.05em' }}>
+            You're on the list! We'll notify you at launch.
+          </p>
+        </div>
+      )}
+
     </section>
   )
 }
